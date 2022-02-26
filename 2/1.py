@@ -10,15 +10,26 @@
 from bs4 import BeautifulSoup
 import requests
 import json
-import time
-from pprint import pprint
 import pandas as pd
 
-base_url = 'https://hh.ru/vacancy/'
-vacancy_ids = [52916604 + i * 10 for i in range(0, 10)]
-result = []
+search_url = 'https://api.hh.ru/vacancies?text='
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36'}
+
+search_str = input('Введите наименование вакансии:\n')
+response = requests.get(f'{search_url}{search_str}', headers=headers)
+content = response.content.decode(encoding=response.encoding)
+
+vacancy_ids = []
+j = json.loads(content)
+
+for i in j['items']:
+    vacancy_ids.append(int(i['id']))
+
+base_url = 'https://hh.ru/vacancy/'
+
+result = []
+
 
 for i in vacancy_ids:
     response = requests.get(f'{base_url}{i}', headers=headers)
@@ -47,3 +58,31 @@ with open('hh.json', 'w') as f:
 
 df = pd.DataFrame(result)
 print(df)
+
+'''
+Введите наименование вакансии:
+oracle developer
+                                         title  ...                             url
+0           Разработчик PL/SQL Oracle (remote)  ...  https://hh.ru/vacancy/52920831
+1                           Разработчик Oracle  ...  https://hh.ru/vacancy/52039996
+2                         Senior ETL Developer  ...  https://hh.ru/vacancy/52513175
+3                    Разработчик PL/SQL,Oracle  ...  https://hh.ru/vacancy/52896576
+4                    Разработчик Oracle PL/SQL  ...  https://hh.ru/vacancy/53076520
+5                    Developer PL / SQL Oracle  ...  https://hh.ru/vacancy/52855084
+6                      Oracle Data Base Expert  ...  https://hh.ru/vacancy/52367344
+7                      Oracle/PL/SQL Developer  ...  https://hh.ru/vacancy/52210014
+8                           Разработчик Oracle  ...  https://hh.ru/vacancy/48840394
+9           Middle Database Developer (Oracle)  ...  https://hh.ru/vacancy/52527606
+10  Senior Java разработчик (Продукт Big Data)  ...  https://hh.ru/vacancy/52840097
+11                Програміст -PL/SQL Developer  ...  https://hh.ru/vacancy/52959394
+12         Старший/ Ведущий разработчик Oracle  ...  https://hh.ru/vacancy/50177480
+13                       Разработчик Oracle BI  ...  https://hh.ru/vacancy/50746642
+14                          Разработчик Oracle  ...  https://hh.ru/vacancy/53088913
+15                SQL developer/Разработчик БД  ...  https://hh.ru/vacancy/50651330
+16                          Программист Oracle  ...  https://hh.ru/vacancy/53087520
+17                 Программист Oracle (PL/SQL)  ...  https://hh.ru/vacancy/52102888
+18                          Разработчик Oracle  ...  https://hh.ru/vacancy/48840395
+19                            Java разработчик  ...  https://hh.ru/vacancy/52474604
+
+[20 rows x 6 columns]
+'''
