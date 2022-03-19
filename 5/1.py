@@ -24,6 +24,8 @@ def get_letters():
 
     driver = webdriver.Chrome(service=s, options=options)
 
+    driver.implicitly_wait(10)  # seconds
+
     print('Идем на https://mail.ru')
 
     driver.get('https://mail.ru')
